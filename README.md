@@ -1,61 +1,58 @@
-# Delegation of Authority (DOA) Workflow Tool – Backend API
+# Delegation of Authority (DOA) Governance Workflow Tool
 
-FastAPI backend with SQLite database powering the prototype DOA Governance Workflow Tool.
-
-## Features
-- **Authentication**: JWT token-based auth (`/api/auth/login`, `/api/auth/me`).
-- **RBAC**: Enforces permissions between `ADMIN` and `NORMAL_USER`.
-- **DOA Master Repository**: Controlled retrieval, search, parent/child taxonomy filtering, and full version history snapshots.
-- **Change Requests**: Proposal creation for `ADD`, `MODIFY`, `DELETE` operations.
-- **Diff Engine**: Field-by-field difference calculation (`ADDED`, `MODIFIED`, `REMOVED`, `UNCHANGED`).
-- **Version Management & Publishing**: Controlled promotion where publishing bumps the active version to `v(n+1)` and archives `v(n)` as `HISTORICAL`.
-- **Optimistic Concurrency Protection**: Returns `409 Conflict` if publishing a change request created against an outdated version.
-- **Audit Trail**: Every change submission, review, approval, and publication writes a tamper-evident audit record.
-- **Dashboard KPIs**: Aggregate metrics on master records, key decisions, regulatory items, and change queues.
+A full-stack enterprise prototype for managing, inspecting, reviewing, and publishing Delegations of Authority (DOA) with two lines of defense (2LoD) governance.
 
 ---
 
-## Demo Credentials
-| Role | Email | Password | Permissions |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@doa.local` | `Admin@123` | View all, approve, reject, publish, view audit logs |
-| **Normal User** | `user@doa.local` | `User@123` | Search, filter, view DOA, submit change requests |
+## Project Structure
+
+```text
+DOA/
+├── frontend/                  # React 19 + Vite Single Page Application
+│   ├── src/                   # React components, dashboards, services
+│   ├── public/                # Static public assets
+│   ├── index.html             # Single-page application root
+│   ├── package.json           # Frontend dependencies & scripts
+│   ├── vite.config.js         # Vite bundler configuration
+│   └── tailwind.config.js     # Styling & theme design tokens
+│
+├── backend/                   # FastAPI REST API Backend
+│   ├── app/                   # API routes, business logic services, models
+│   ├── requirements.txt       # Python dependencies
+│   ├── doa.db                 # SQLite database
+│   └── seed.py                # Database seed script
+│
+├── development.md             # In-depth architectural & data flow documentation
+└── README.md                  # Project overview & startup instructions
+```
 
 ---
 
-## Setup & Running Locally
+## Quick Start
 
-### 1. Virtual Environment
+### 1. Start the Backend Service
 ```powershell
-cd c:\Works\DOA\backend
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-*(If PowerShell execution policy prevents script activation, run commands directly with `.venv\Scripts\python.exe`)*
-
-### 2. Install Dependencies
-```powershell
-.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-### 3. Seed Database
-Seeds default users and 53 published DOA master records:
-```powershell
-.venv\Scripts\python.exe -m app.seed
-```
-
-### 4. Run Development Server
-```powershell
+cd backend
 .venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
-- API Base: `http://localhost:8000`
-- Interactive OpenAPI Docs: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+API Documentation will be accessible at: `http://localhost:8000/docs`
+
+### 2. Start the Frontend Application
+```powershell
+cd frontend
+npm run dev
+```
+The React frontend will be accessible at: `http://localhost:5173`
 
 ---
 
-## Running Automated Tests
-```powershell
-.venv\Scripts\python.exe -m pytest tests -v
-```
-All 12 tests validate authentication, RBAC authorization, diff engine, version bumping, conflict detection, and audit trail.
+## Role-Based Logins & Credentials
+
+| Role | Email | Password | Landing Route |
+| :--- | :--- | :--- | :--- |
+| **Normal User** (Requester) | `user@doa.local` | `User@123` | `http://localhost:5173/login/normaluser` |
+| **Governance Team** (Reviewer) | `governance@doa.local` | `Gov@123` | `http://localhost:5173/login/governance` |
+| **DOA Administrator** (Executive) | `doaadmin@doa.local` | `DoaAdmin@123` | `http://localhost:5173/login/doa-admin` |
+| **System Administrator** (IT/Ops) | `sysadmin@doa.local` | `SysAdmin@123` | `http://localhost:5173/login/system-admin` |
+
+For detailed architectural diagrams and data flow documentation, refer to [development.md](file:///C:/Works/DOA/development.md).
